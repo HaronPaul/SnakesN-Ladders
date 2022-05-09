@@ -16,6 +16,9 @@ clock = pygame.time.Clock()
 
 def main():
     field = Field()
+
+    # Call the draw_squares function of the field instance  
+    field.draw_squares(WIN)
     clock.tick(FPS)
     run = True
 
@@ -30,8 +33,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
         
-        # Call the draw_squares function of the field instance    
-        field.draw_squares(WIN)
         pygame.display.update()
 
     pygame.quit()

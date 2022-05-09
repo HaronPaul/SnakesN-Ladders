@@ -2,13 +2,68 @@ import pygame
 import numpy as np
 import os
 from game.constants import VIOLET, YELLOW, BLACK, ROWS, COLS, SQUARE_SIZE
+from game.powerUp import PowerUp
+
+# This function creates the field that contains the snake tiles, ladder tiles,
+# and power-up and power-downs tiles. This returns a matrix.
+# 1 -> Ladder
+# -1 -> Snake
+# 0 -> Normal Tile
+# 2 -> Power=up tile
+def generateField(powerUps):
+    # List for the snake tiles and ladder tiles
+    snakeTiles = [(7,9), (5,6), (4,4), (2,7), (1,1)]
+    ladderTiles = [(9,1), (7,8), (5,2), (3,2), (2,9)]
+
+    # Generate the field as a matrix filled with zeros
+    field = np.zeros([10,10], dtype=int)
+
+    # Fill the snake tile with -1
+    for tile in snakeTiles:
+        field[tile[0]][tile[1]] = -1
+    
+    # Fill the ladder tile with 1
+    for tile in ladderTiles:
+        field[tile[0]][tile[1]] = 1
+
+    # Generate power up tiles
+    powerUpFileNames = ['plus1.png', 'plus2.png', 'plus3.png', 'minus1.png', 'minus2.png', 'minus3.png']
+    powerUpNumbers = [-3,-2,-1,1,2,3]
+    i = 0
+    # 6 power ups in total
+    while i < 6:
+        powerUpRow = np.random.randint(0,10)
+        powerUpColumn = np.random.randint(0,10)
+
+        # Check if randomized tile is already a snake/ladder or if it is on number1 tile
+        if field[powerUpRow][powerUpColumn] != 0 or (powerUpRow == 9 and powerUpColumn == 0):
+            continue
+        field[powerUpRow][powerUpColumn] = 2
+        
+        # Details of the powerup
+        picPath = os.path.join(os.path.dirname(__file__), '..', 'assets', f"{powerUpFileNames[i]}") # Import the image using its path
+        
+        # Type of power-up, either plus or minus
+        if powerUpNumbers[i] > 0: powerUpType = 'Plus'
+        else: powerUpType = 'Minus'
+
+        # Pixel location of the power-up
+        powerUpLocationX = SQUARE_SIZE*powerUpColumn
+        powerUpLocationY =  SQUARE_SIZE*powerUpRow
+
+        # Add a new instance of power up to the powerUps list
+        powerUps.append(PowerUp(picPath, powerUpType, powerUpNumbers[i], powerUpRow, powerUpColumn, powerUpLocationX, powerUpLocationY))
+        i += 1
+    print(field)
 
 class Field:
     # Constructor for creating a Field instance
     def __init__(self):
-        print('Wew')
+        self.powerUps = []  # This list contains the tiles for the powerUps
+        generateField(self.powerUps)    # Generate the field containing snakes, ladders, and power ups
+        print(self.powerUps)
 
-    
+
     # Function for drawing each squares, snakes, and ladders 
     # in the board
     def draw_squares(self, win):
@@ -38,7 +93,7 @@ class Field:
             # Get the number to the corresponding row. 1st row contains 100
             renderTile = leftNumbers[i]
             for j in range(COLS):
-                # Draw the rectangle on win using color and dimensions
+                # Draw the rectangle on Win using color and dimensions
                 if j%2 ==    0:
                     pygame.draw.rect(win, color1, (j*SQUARE_SIZE, i*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
                 else:
@@ -69,8 +124,8 @@ class Field:
         win.blit(ladder4, (177, 175))
         win.blit(ladder5, (656, 92))
 
-        
-
-       
-
-      
+        # Draw the power-ups as a group
+        powerUpGroups = pygame.sprite.Group()
+        for p in self.powerUps:
+            powerUpGroups.add(p)
+        powerUpGroups.draw(win)
