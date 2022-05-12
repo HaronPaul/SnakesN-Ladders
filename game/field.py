@@ -41,7 +41,8 @@ def generateField(powerUps):
         field[powerUpRow][powerUpColumn] = 2
         
         # Details of the powerup
-        picPath = os.path.join(os.path.dirname(__file__), '..', 'assets', f"{powerUpFileNames[i]}") # Import the image using its path
+        # Path of the image
+        picPath = os.path.join(os.path.dirname(__file__), '..', 'assets', f"{powerUpFileNames[i]}") 
         
         # Type of power-up, either plus or minus
         if powerUpNumbers[i] > 0: powerUpType = 'Plus'
@@ -61,8 +62,6 @@ class Field:
     def __init__(self):
         self.powerUps = []  # This list contains the tiles for the powerUps
         generateField(self.powerUps)    # Generate the field containing snakes, ladders, and power ups
-        print(self.powerUps)
-
 
     # Function for drawing each squares, snakes, and ladders 
     # in the board
@@ -125,7 +124,7 @@ class Field:
         win.blit(ladder5, (656, 92))
 
         # Draw the power-ups as a group
-        powerUpGroups = pygame.sprite.Group()
+        powerUpGroup = pygame.sprite.Group()
         for p in self.powerUps:
-            powerUpGroups.add(p)
-        powerUpGroups.draw(win)
+            powerUpGroup.add(p)
+        powerUpGroup.draw(win)
