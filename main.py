@@ -4,7 +4,7 @@ import os
 from game.constants import WIDTH, HEIGHT, VIOLET
 from game.field import Field
 from game.player import Player
-from game.functions import rollDice
+from game.functions import renderExtras
 
 pygame.init()
 
@@ -21,46 +21,56 @@ def main():
     field = Field()
 
     # Call the draw_squares function of the field instance  
-    field.draw_squares(WIN)
+    # field.draw_squares(WIN)
+    playerList = []
+
+    # Render other asssets (buttons, player text, etc)
+    # renderExtras(WIN)
     
-    playerGroup = pygame.sprite.Group()
-    
-    # Instantiate the players
+    # Instantiate the players 
     for i in range(NUM_PLAYERS):
         picPath = os.path.join(os.path.dirname(__file__), 'assets', f'player{i+1}.png')
         playerImage = pygame.image.load(picPath)
         newPlayer = Player(playerImage, i+1, 0, 720) # Initialize player's position at number 1 tile
-        playerGroup.add(newPlayer)
-    
-    # Render the player sprites
-    playerGroup.draw(WIN)
+        playerList.append(newPlayer)
 
-    # Render a button on the bottom right of the screen
-    myFont = pygame.font.SysFont('Arial', 40)
-    rollText = myFont.render('ROLL DICE', True, (255,255,255))
-    pygame.draw.rect(WIN, VIOLET, [580, 815, 200,70])
-    WIN.blit(rollText, (580,815))
-
-    clock.tick(FPS)
     run = True
 
+    currentPlayer = 1 # Initialize player 1 at start of the game
     while run:
+
+        # Reset rendering every loop 
+        renderExtras(WIN)
+        field.draw_squares(WIN)
+        for p in playerList:
+            p.draw(WIN)
+                
         # Loop through all the events happening
         # May be a mouse click/key press
         for event in pygame.event.get():
             # When user clicks the close button of the window
-            # equate run to False
+            # equate run to False and hasPlayed to True
             if event.type == pygame.QUIT:
                 run = False
-            
+
             # If clicked position is the 'Roll Dice Button'
             # then randomize a number
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if (mouse_pos[0] >= 580 and  mouse_pos[0] <= 780) and (mouse_pos[1] >= 815 and mouse_pos[1] <= 885):
-                    rollDice()
+                if (mouse_pos[0] >= 450 and  mouse_pos[0] <= 800) and (mouse_pos[1] >= 800 and mouse_pos[1] <= 900):
+                    playerList[currentPlayer - 1].rollDice()
+                    # playerList[currentPlayer - 1].isMoving = True
+                    # playerList[currentPlayer - 1].moveRight = True
+        playerList[currentPlayer - 1].update()
+        
+        if(playerList[currentPlayer - 1].turnDone == True and playerList[currentPlayer - 1].rolled == True):
+            playerList[currentPlayer - 1].rolled = False
+            playerList[currentPlayer - 1].turnDone == False
+            if currentPlayer == 4: currentPlayer = 1
+            else: currentPlayer += 1
 
         pygame.display.update()
+        clock.tick(FPS)
     pygame.quit()
 
 if __name__ == '__main__':
