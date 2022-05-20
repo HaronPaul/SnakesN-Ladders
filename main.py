@@ -58,14 +58,18 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if (mouse_pos[0] >= 450 and  mouse_pos[0] <= 800) and (mouse_pos[1] >= 800 and mouse_pos[1] <= 900):
-                    playerList[currentPlayer - 1].rollDice()
+
+                    # This condition will prevent other players from clicking when a player is currently moving
+                    if(playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False):
+                        print('Clicked the roll button')
+                        playerList[currentPlayer - 1].rollDice()
                     # playerList[currentPlayer - 1].isMoving = True
                     # playerList[currentPlayer - 1].moveRight = True
         playerList[currentPlayer - 1].update()
         
-        if(playerList[currentPlayer - 1].turnDone == True and playerList[currentPlayer - 1].rolled == True):
+        if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
+            print('Player turn is done')
             playerList[currentPlayer - 1].rolled = False
-            playerList[currentPlayer - 1].turnDone == False
             if currentPlayer == 4: currentPlayer = 1
             else: currentPlayer += 1
 

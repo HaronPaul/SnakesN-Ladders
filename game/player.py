@@ -4,6 +4,7 @@ import pygame.sprite as sprite
 import pygame.rect as Rect
 from game.constants import SQUARE_SIZE, WIDTH
 
+
 class Player():
     def __init__(self, image, playerNum, pos_X, pos_Y):
         self.image = image
@@ -18,7 +19,6 @@ class Player():
         self.evenY = [0+5, 160+5, 320+5, 480+5, 640+5]
         self.oddY = [80+5, 240+5, 400+5, 560+5, 720+5]
         self.rolled = False
-        self.turnDone = False
 
         # Controllers for player movement
         self.moveLeft = False
@@ -93,16 +93,10 @@ class Player():
                 self.rect.x += self.velX
                 self.rect.y += self.velY
             else:
-                print(f'startX = {self.rect.x} endX = {self.endX}')
                 self.isMoving = False
         elif self.currentRow % 2 == 0:
             if self.rect.x > self.endX:
                 self.rect.x += self.velX
                 self.rect.y += self.velY
             else:
-                print(f'startX = {self.rect.x} endX = {self.endX}')
-                print('Done Moving')
                 self.isMoving = False
-
-        if self.rolled == True and self.isMoving == False:
-            self.turnDone = True
