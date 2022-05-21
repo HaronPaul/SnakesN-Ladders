@@ -72,6 +72,7 @@ class Field:
         ladder3 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'ladder3.png'))
         ladder4 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'ladder4.png'))
         ladder5 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'ladder5.png'))
+        ladder6 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'ladder6.png'))
 
         # Load snake image files
         snake1 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake1.png'))
@@ -79,6 +80,8 @@ class Field:
         snake3 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake3.png'))
         snake4 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake4.png'))
         snake5 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake5.png'))
+        snake6 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake6.png'))
+        snake7 = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'snake7.png'))
 
         color1 = VIOLET  # Color variable alternates to yellow/violet
         color2 = YELLOW
@@ -110,18 +113,21 @@ class Field:
             color2 = VIOLET if color2 == YELLOW else YELLOW
         
         # Drawing snakes
-        win.blit(snake1, (510,590))
-        win.blit(snake2, (283,391))
-        win.blit(snake3, (563,170))
-        win.blit(snake4, (65,350))
-        win.blit(snake5, (87,85))
+        win.blit(snake1, (430,530))
+        win.blit(snake2, (253,353))
+        win.blit(snake3, (503,130))
+        win.blit(snake4, (76,320))
+        win.blit(snake5, (83,86))
+        win.blit(snake6, (130,10))
+        win.blit(snake7, (357,25))
         
         # Drawing ladders
-        win.blit(ladder1, (100,500))
-        win.blit(ladder2, (514,195))
-        win.blit(ladder3, (25, 180))
-        win.blit(ladder4, (177, 175))
-        win.blit(ladder5, (656, 92))
+        win.blit(ladder1, (250,490))
+        win.blit(ladder2, (456,165))
+        win.blit(ladder3, (25, 160))
+        win.blit(ladder4, (165, 165))
+        win.blit(ladder5, (580, 85))
+        win.blit(ladder6, (25, 445))
 
         # Draw the power-ups as a group
         powerUpGroup = pygame.sprite.Group()

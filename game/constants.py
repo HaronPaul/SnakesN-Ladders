@@ -14,4 +14,4 @@ ROWS = 10
 COLS = 10 
 
 # Size of the square is width of the window divided by the number of columns
-SQUARE_SIZE = (WIDTH - 100) // COLS
+SQUARE_SIZE = HEIGHT // COLS

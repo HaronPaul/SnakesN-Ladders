@@ -16,8 +16,8 @@ class Player():
         self.velY = 0
         self.endX = 0
         self.endY = 0
-        self.evenY = [0+5, 160+5, 320+5, 480+5, 640+5]
-        self.oddY = [80+5, 240+5, 400+5, 560+5, 720+5]
+        self.evenY = [0+5, 140+5, 280+5, 420+5, 560+5]
+        self.oddY = [70+5, 210+5, 350+5, 490+5, 630+5]
         self.rolled = False
 
         # Controllers for player movement
@@ -61,13 +61,12 @@ class Player():
             self.moveLeft = False
             self.moveRight = True
 
-            # if (self.rect.y % (2*SQUARE_SIZE)) + 5 == 5:
             if self.rect.y in self.evenY:
                 self.currentRow -= 1
 
                 # Recalculate endX when changing rows
                 self.endX = WIDTH - (abs(self.endX - WIDTH) + SQUARE_SIZE)
-            if self.rect.x >= 9*SQUARE_SIZE:
+            if self.rect.x >= 9*SQUARE_SIZE - 5:
                 self.moveUp = True
                 self.moveRight = False
                 
@@ -84,7 +83,7 @@ class Player():
 
                 # Recalculate endX when changing rows
                 self.endX = abs(self.endX - 0) - SQUARE_SIZE
-            if self.rect.x <= 0:
+            if self.rect.x <= 0 + 5:
                 self.moveUp = True  
                 self.moveLeft = False
 
