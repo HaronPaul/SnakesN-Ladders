@@ -12,6 +12,7 @@ from game.powerUp import PowerUp
 # 2 -> Power=up tile
 def generateField(powerUps):
     # List for the snake tiles and ladder tiles
+
     snakeTiles = [(7,9), (5,6), (4,4), (2,7), (1,1)]
     ladderTiles = [(9,1), (7,8), (5,2), (3,2), (2,9)]
 
@@ -60,6 +61,10 @@ def generateField(powerUps):
 class Field:
     # Constructor for creating a Field instance
     def __init__(self):
+        self.snakeStart = [(630, 490), (420, 350), (280, 280), (490,140), (70,70), (140, 0)]
+        self.snakeEnd = [(420, 630), (350, 560), (70, 560), (630,280), (70, 350), (350,280)]
+        self.ladderStart = [(210, 630), (0,490), (560,490), (140,350), (140,210), (630,140)]
+        self.ladderEnd = [(280, 490), (70,420), (420,140), (280,140), (0,140), (560,70)]
         self.powerUps = []  # This list contains the tiles for the powerUps
         generateField(self.powerUps)    # Generate the field containing snakes, ladders, and power ups
 

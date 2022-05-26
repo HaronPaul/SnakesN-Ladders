@@ -45,8 +45,13 @@ def renderExtras(WIN, currentPlayer):
 
 def renderDiceNumber(WIN, diceNumber):
     pygame.draw.rect(WIN, (0,0,0), pygame.Rect(700,220,100,100))
-    DICE_NUMBER_TEXT = get_font(70).render(str(diceNumber), True, 'white')
-    DICE_NUMBER_TEXT_POS = DICE_NUMBER_TEXT.get_rect(center=(((700+800) / 2), 250))
-    WIN.blit(DICE_NUMBER_TEXT, DICE_NUMBER_TEXT_POS)
+
+    picPath =  os.path.join(os.path.dirname(__file__), '..', 'assets', f'{diceNumber}.png')
+    diceImage = pygame.image.load(picPath)
+
+    # DICE_NUMBER_TEXT = get_font(70).render(str(diceNumber), True, 'white')
+    # DICE_NUMBER_TEXT_POS = DICE_NUMBER_TEXT.get_rect(center=(((700+800) / 2), 250))
+    # WIN.blit(DICE_NUMBER_TEXT, DICE_NUMBER_TEXT_POS)
+    WIN.blit(diceImage, (700, 220))
 
 

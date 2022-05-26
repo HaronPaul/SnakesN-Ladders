@@ -29,7 +29,7 @@ def main():
     for i in range(NUM_PLAYERS):
         picPath = os.path.join(os.path.dirname(__file__), 'assets', f'player{i+1}.png')
         playerImage = pygame.image.load(picPath)
-        newPlayer = Player(playerImage, i+1, 0, 630) # Initialize player's position at number 1 tile
+        newPlayer = Player(playerImage, i+1, 0, 630, field) # Initialize player's position at number 1 tile
         playerList.append(newPlayer)
 
     run = True
@@ -59,19 +59,20 @@ def main():
                 # mouse_pos = pygame.mouse.get_pos()
                 # if (mouse_pos[0] >= 450 and  mouse_pos[0] <= 800) and (mouse_pos[1] >= 800 and mouse_pos[1] <= 900):
 
-                # This condition will prevent other players from clicking when a player is currently moving
+                    # This condition will prevent other players from moving when the currebt player is moving
                     if playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
                         print('Pressed the space button')
                         playerList[currentPlayer - 1].rollDice()
                         diceNumber = playerList[currentPlayer - 1].rolledNumber
+        
+        # Update the dice number text on screen
         if playerList[currentPlayer - 1].isMoving:
             renderDiceNumber(WIN, diceNumber)
-        # Update the dice number text on screen
-        
-
+            
         playerList[currentPlayer - 1].update()
         
         if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
+            playerList[currentPlayer - 1].checkTile()
             print('Player turn is done')
             playerList[currentPlayer - 1].rolled = False
             if currentPlayer == 4: currentPlayer = 1
