@@ -1,4 +1,3 @@
-from dataclasses import field
 import random
 from game.constants import SQUARE_SIZE, WIDTH
 
@@ -28,12 +27,16 @@ class Player():
         self.moveDown = False
 
         self.currentRow = 9
+        self.currentCol = 0
         self.speed = 5
         self.rolledNumber = 0
         self.isMoving = False
+        self.isWaiting = True
+        self.aligned = False
 
     def rollDice(self):
         self.rolled = True
+        self.playedPower = False
         self.rolledNumber = random.randint(1,6)
         if(self.currentRow % 2 == 1):
             self.endX = self.rect.x + self.rolledNumber*SQUARE_SIZE
@@ -43,6 +46,15 @@ class Player():
         print(f'Start x is {self.rect.x}')
         print(f'End x is {self.endX}')
         print('----------------')
+
+    def realign(self):
+        x = self.rect.center[0]
+        y = self.rect.center[1]
+        pos_x = x // SQUARE_SIZE
+        pos_y = y // SQUARE_SIZE
+        self.currentCol = pos_x
+        self.rect.x = pos_x * SQUARE_SIZE
+        self.rect.y = pos_y * SQUARE_SIZE
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -58,22 +70,32 @@ class Player():
         ladderEnd = self.field.ladderEnd
         snakeStart = self.field.snakeStart
         snakeEnd = self.field.snakeEnd
+        powerUpTiles = self.field.powerUps
 
+        # Check if tile is ladder
         for i in range(len(ladderStart)):
             if (self.rect.x + self.width//2) in range(ladderStart[i][0], ladderStart[i][0]+SQUARE_SIZE) and (self.rect.y + self.height // 2) in range(ladderStart[i][1], ladderStart[i][1]+SQUARE_SIZE):
-                print('Player is in ladder tile')
                 self.endX = self.rect.x = ladderEnd[i][0]
                 self.rect.y = ladderEnd[i][1]
                 self.currentRow = ladderEnd[i][1] // SQUARE_SIZE
+                self.currentCol = ladderEnd[i][0] // SQUARE_SIZE
                 break
                 
+        # Check if tile is snake
         for i in range(len(snakeStart)):
              if (self.rect.x + self.width//2) in range(snakeStart[i][0], snakeStart[i][0]+SQUARE_SIZE) and (self.rect.y + self.height // 2) in range(snakeStart[i][1], snakeStart[i][1]+SQUARE_SIZE):
-                print('Player is in ladder tile')
                 self.endX = self.rect.x = snakeEnd[i][0]
                 self.rect.y = snakeEnd[i][1]
                 self.currentRow = snakeEnd[i][1] // SQUARE_SIZE
+                self.currentCol = snakeEnd[i][0] // SQUARE_SIZE
                 break
+        
+        # Check if tile is power-up
+        for i in range(len(powerUpTiles)):
+              if(self.rect.x + self.width//2) in range(powerUpTiles[i].pos[0], powerUpTiles[i].pos[0]+SQUARE_SIZE) and (self.rect.y + self.height // 2) in range(powerUpTiles[i].pos[1], powerUpTiles[i].pos[1]+SQUARE_SIZE):
+                  if powerUpTiles[i].consumed == False:
+                    powerUpTiles[i].consumed = True
+                    self.inventory.append(powerUpTiles[i])
 
     def update(self):
         self.isMoving = True
@@ -124,10 +146,18 @@ class Player():
                 self.rect.x += self.velX
                 self.rect.y += self.velY
             else:
-                self.isMoving = False
+                self.realign()
+                if len(self.inventory) > 0 and self.isWaiting and self.rolled:
+                    print('Waiting for power play')
+                else: 
+                    self.isMoving = False
         elif self.currentRow % 2 == 0:
             if self.rect.x > self.endX:
                 self.rect.x += self.velX
                 self.rect.y += self.velY
             else:
-                self.isMoving = False
+                self.realign()
+                if len(self.inventory) > 0 and self.isWaiting and self.rolled:
+                    print('Waiting for power play')
+                else:                  
+                    self.isMoving = False

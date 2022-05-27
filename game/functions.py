@@ -54,4 +54,20 @@ def renderDiceNumber(WIN, diceNumber):
     # WIN.blit(DICE_NUMBER_TEXT, DICE_NUMBER_TEXT_POS)
     WIN.blit(diceImage, (700, 220))
 
+def renderPlayerInventory(WIN, player):
+    pygame.draw.rect(WIN, (0,0,0), pygame.Rect(700,400,100,500))
+
+    start = 410
+    for powerUp in player.inventory:
+        drawX = ((700 + 800) // 2) - (powerUp.image.get_size()[0] // 2)
+        WIN.blit(powerUp.image, (drawX, start))
+        start += 80
+
+    text1 = 'Pass'
+    PASS_TEXT = get_font(25).render(text1, True, 'white')
+    PASS_TEXT_POS = PASS_TEXT.get_rect(center=(((700+800) / 2), 670))
+    WIN.blit(PASS_TEXT, PASS_TEXT_POS)
+
+def playPowerUp():
+    print('Play a power up')
 

@@ -31,10 +31,14 @@ def generateField(powerUps):
     powerUpFileNames = ['plus1.png', 'plus2.png', 'plus3.png', 'minus1.png', 'minus2.png', 'minus3.png']
     powerUpNumbers = [-3,-2,-1,1,2,3]
     i = 0
+
     # 6 power ups in total
     while i < 6:
-        powerUpRow = np.random.randint(0,10)
-        powerUpColumn = np.random.randint(0,10)
+        # powerUpRow = np.random.randint(0,10)
+        # powerUpColumn = np.random.randint(0,10)
+
+        powerUpRow = 9
+        powerUpColumn = i+2
 
         # Check if randomized tile is already a snake/ladder or if it is on number1 tile
         if field[powerUpRow][powerUpColumn] != 0 or (powerUpRow == 9 and powerUpColumn == 0):
@@ -135,7 +139,3 @@ class Field:
         win.blit(ladder6, (25, 445))
 
         # Draw the power-ups as a group
-        powerUpGroup = pygame.sprite.Group()
-        for p in self.powerUps:
-            powerUpGroup.add(p)
-        powerUpGroup.draw(win)

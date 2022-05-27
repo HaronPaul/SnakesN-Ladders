@@ -4,7 +4,7 @@ import os
 from game.constants import WIDTH, HEIGHT, VIOLET
 from game.field import Field
 from game.player import Player
-from game.functions import renderExtras, renderDiceNumber
+from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, playPowerUp
 
 pygame.init()
 
@@ -23,24 +23,32 @@ def main():
     # Call the draw_squares function of the field instance  
     playerList = []
 
-    # Render other asssets (buttons, player text, etc)
-    
     # Instantiate the players 
     for i in range(NUM_PLAYERS):
         picPath = os.path.join(os.path.dirname(__file__), 'assets', f'player{i+1}.png')
         playerImage = pygame.image.load(picPath)
+
+        # 3rd and 4th parameters are x and y position
         newPlayer = Player(playerImage, i+1, 0, 630, field) # Initialize player's position at number 1 tile
         playerList.append(newPlayer)
 
+    powerUpGroup = pygame.sprite.Group()
+    for p in field.powerUps:
+       powerUpGroup.add(p)
     run = True
 
     currentPlayer = 1 # Initialize player 1 at start of the game
     while run:
 
         # Reset rendering every loop 
+        # Render other asssets (buttons, player text, etc)
         renderExtras(WIN, currentPlayer)
-
         field.draw_squares(WIN)
+        
+        #Render the power-ups 
+        powerUpGroup.draw(WIN)
+
+        # Render the players
         for p in playerList:
             p.draw(WIN)
                 
@@ -52,32 +60,39 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-            # If clicked position is the 'Roll Dice Button'
-            # then randomize a number
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                # mouse_pos = pygame.mouse.get_pos()
-                # if (mouse_pos[0] >= 450 and  mouse_pos[0] <= 800) and (mouse_pos[1] >= 800 and mouse_pos[1] <= 900):
-
                     # This condition will prevent other players from moving when the currebt player is moving
                     if playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
                         print('Pressed the space button')
                         playerList[currentPlayer - 1].rollDice()
                         diceNumber = playerList[currentPlayer - 1].rolledNumber
-        
+
+                if event.key == pygame.K_ESCAPE:
+                    if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and len(playerList[currentPlayer - 1].inventory) > 0:
+                        playerList[currentPlayer - 1].isWaiting = False
+                        print('Player has played a power-up')
+                        
+
         # Update the dice number text on screen
         if playerList[currentPlayer - 1].isMoving:
             renderDiceNumber(WIN, diceNumber)
+        
+        if len(playerList[currentPlayer - 1].inventory) > 0:
+            renderPlayerInventory(WIN, playerList[currentPlayer - 1])
             
         playerList[currentPlayer - 1].update()
-        
+
         if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
+            print(f'Player {currentPlayer} is done')
             playerList[currentPlayer - 1].checkTile()
-            print('Player turn is done')
             playerList[currentPlayer - 1].rolled = False
+            playerList[currentPlayer - 1].aligned = False
+            if len(playerList[currentPlayer - 1].inventory) > 0: playerList[currentPlayer - 1].isWaiting = True
             if currentPlayer == 4: currentPlayer = 1
             else: currentPlayer += 1
-
+        
+        powerUpGroup.update()
         pygame.display.update()
         clock.tick(FPS)
     pygame.quit()

@@ -11,7 +11,13 @@ class PowerUp(sprite.Sprite):
         self.rect = self.image.get_rect()
         self.row = row
         self.col = col
+        self.pos = (pos_X, pos_Y)
         self.type = type
         self.number = number
         self.rect = self.image.get_rect()
-        self.rect.center = ((pos_X+SQUARE_SIZE / 2),(pos_Y + SQUARE_SIZE / 2) ) # Location is at the center of the tile
+        self.consumed = False
+        self.rect.center = ((pos_X+SQUARE_SIZE / 2),(pos_Y + SQUARE_SIZE / 2)) # Location is at the center of the tile
+
+    def update(self):
+        if self.consumed == True:
+            self.kill()
