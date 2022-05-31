@@ -28,7 +28,7 @@ def generateField(powerUps):
         field[tile[0]][tile[1]] = 1
 
     # Generate power up tiles
-    powerUpFileNames = ['plus1.png', 'plus2.png', 'plus3.png', 'minus1.png', 'minus2.png', 'minus3.png']
+    powerUpFileNames = ['minus3.png', 'minus2.png', 'minus1.png', 'plus1.png', 'plus2.png', 'plus3.png']
     powerUpNumbers = [-3,-2,-1,1,2,3]
     i = 0
 
@@ -48,17 +48,13 @@ def generateField(powerUps):
         # Details of the powerup
         # Path of the image
         picPath = os.path.join(os.path.dirname(__file__), '..', 'assets', f"{powerUpFileNames[i]}") 
-        
-        # Type of power-up, either plus or minus
-        if powerUpNumbers[i] > 0: powerUpType = 'Plus'
-        else: powerUpType = 'Minus'
 
         # Pixel location of the power-up
         powerUpLocationX = SQUARE_SIZE*powerUpColumn
         powerUpLocationY =  SQUARE_SIZE*powerUpRow
 
         # Add a new instance of power up to the powerUps list
-        powerUps.append(PowerUp(picPath, powerUpType, powerUpNumbers[i], powerUpRow, powerUpColumn, powerUpLocationX, powerUpLocationY))
+        powerUps.append(PowerUp(picPath, powerUpNumbers[i], powerUpRow, powerUpColumn, powerUpLocationX, powerUpLocationY))
         i += 1
     print(field)
 

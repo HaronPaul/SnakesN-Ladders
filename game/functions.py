@@ -2,6 +2,8 @@ from xml.etree.ElementTree import tostring
 import pygame
 import os
 
+from game.powerUp import PowerUp
+
 def get_font(size):
     fontPath = os.path.join(os.path.dirname(__file__), '..', 'assets', "KB3BusRoute123.ttf") 
     return pygame.font.Font(fontPath, size)
@@ -68,6 +70,9 @@ def renderPlayerInventory(WIN, player):
     PASS_TEXT_POS = PASS_TEXT.get_rect(center=(((700+800) / 2), 670))
     WIN.blit(PASS_TEXT, PASS_TEXT_POS)
 
-def playPowerUp():
-    print('Play a power up')
+def consumePowerUp(WIN, player, keyPressed):
+    index = 0
+    
+    print(f'Key pressed is {index}')
+    print('Remove the power-up here')
 

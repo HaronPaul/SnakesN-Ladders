@@ -1,4 +1,6 @@
 import random
+from shutil import move
+import pygame
 from game.constants import SQUARE_SIZE, WIDTH
 
 
@@ -32,11 +34,9 @@ class Player():
         self.rolledNumber = 0
         self.isMoving = False
         self.isWaiting = True
-        self.aligned = False
 
     def rollDice(self):
         self.rolled = True
-        self.playedPower = False
         self.rolledNumber = random.randint(1,6)
         if(self.currentRow % 2 == 1):
             self.endX = self.rect.x + self.rolledNumber*SQUARE_SIZE
@@ -53,8 +53,10 @@ class Player():
         pos_x = x // SQUARE_SIZE
         pos_y = y // SQUARE_SIZE
         self.currentCol = pos_x
+        self.currentRow = pos_y
         self.rect.x = pos_x * SQUARE_SIZE
         self.rect.y = pos_y * SQUARE_SIZE
+        self.aligned = False
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -97,6 +99,59 @@ class Player():
                     powerUpTiles[i].consumed = True
                     self.inventory.append(powerUpTiles[i])
 
+    def calculateJumpTile(self, keyPressed):
+        index = 0
+        if keyPressed == 49: index = 1
+        elif keyPressed == 50: index = 2
+        elif keyPressed == 51: index = 3
+        print('Calculate the number of tiles to be moved here')
+
+        if index > len(self.inventory):
+            return
+
+        powerUp = self.inventory[index-1]
+
+        powerUpValue = powerUp.number
+        movement = SQUARE_SIZE * powerUpValue
+        print(f'Move to x = {self.rect.x + movement}')
+
+        # Check what row is the player currently on
+        nextX = 0
+
+        # When player is in an odd-numbered row
+        if self.currentRow % 2 == 1:
+            nextX = self.rect.x + movement
+            if nextX >= 700:
+                excess = nextX - 700
+                self.rect.y -= SQUARE_SIZE
+                self.rect.x = 700 - (excess + SQUARE_SIZE)
+            elif nextX <= 0:
+                excess = abs(nextX)
+                self.rect.y += SQUARE_SIZE
+                self.rect.x = excess - SQUARE_SIZE
+            else:
+                self.rect.x = nextX
+            self.endX = self.rect.x
+        
+        else:
+            nextX = self.rect.x - movement
+            if nextX <= 0:
+                excess = abs(nextX)
+                self.rect.x = excess - SQUARE_SIZE
+                self.rect.y -= SQUARE_SIZE
+            elif nextX >= 700:
+                excess = nextX - 700
+                self.rect.y += SQUARE_SIZE
+                self.rect.x = excess - SQUARE_SIZE
+            else:
+                self.rect.x = nextX
+            self.endX = self.rect.x
+
+        self.realign()
+
+        # Remove the power-up in the inventory
+        self.inventory.remove(powerUp)
+
     def update(self):
         self.isMoving = True
         self.velX = 0
@@ -125,8 +180,6 @@ class Player():
                 
         # Change direction if row is even-numbered
         if self.currentRow % 2 == 0:
-            # print(f'Current x-coord is: {self.rect.x}')
-            # print(f'Next x-coord is: {self.endX}')
             self.moveUp = False
             self.moveRight = False
             self.moveLeft = True
@@ -134,7 +187,7 @@ class Player():
             for oddY in self.oddY:
                 if self.rect.y in range(oddY, oddY+(SQUARE_SIZE//8)):
                     self.currentRow -= 1
-
+                    
                     # Recalculate endX when changing rows
                     self.endX = abs(self.endX - 0) - SQUARE_SIZE
             if self.rect.x <= 0:
@@ -149,8 +202,10 @@ class Player():
                 self.realign()
                 if len(self.inventory) > 0 and self.isWaiting and self.rolled:
                     print('Waiting for power play')
-                else: 
+                    self.aligned = True
+                else:  
                     self.isMoving = False
+                    return
         elif self.currentRow % 2 == 0:
             if self.rect.x > self.endX:
                 self.rect.x += self.velX
@@ -159,5 +214,9 @@ class Player():
                 self.realign()
                 if len(self.inventory) > 0 and self.isWaiting and self.rolled:
                     print('Waiting for power play')
+                    self.aligned = True
                 else:                  
                     self.isMoving = False
+                    return
+
+        

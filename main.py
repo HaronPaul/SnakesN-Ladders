@@ -4,7 +4,7 @@ import os
 from game.constants import WIDTH, HEIGHT, VIOLET
 from game.field import Field
 from game.player import Player
-from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, playPowerUp
+from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, consumePowerUp
 
 pygame.init()
 
@@ -33,11 +33,13 @@ def main():
         playerList.append(newPlayer)
 
     powerUpGroup = pygame.sprite.Group()
+    powerUpHotkeys = [pygame.K_1, pygame.K_2, pygame.K_3]
     for p in field.powerUps:
        powerUpGroup.add(p)
-    run = True
+    playedPowerUp = False
 
     currentPlayer = 1 # Initialize player 1 at start of the game
+    run = True
     while run:
 
         # Reset rendering every loop 
@@ -64,23 +66,27 @@ def main():
                 if event.key == pygame.K_SPACE:
                     # This condition will prevent other players from moving when the currebt player is moving
                     if playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
-                        print('Pressed the space button')
                         playerList[currentPlayer - 1].rollDice()
                         diceNumber = playerList[currentPlayer - 1].rolledNumber
 
                 if event.key == pygame.K_ESCAPE:
-                    if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and len(playerList[currentPlayer - 1].inventory) > 0:
+                    if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and playerList[currentPlayer - 1].aligned and len(playerList[currentPlayer - 1].inventory) > 0:
                         playerList[currentPlayer - 1].isWaiting = False
-                        print('Player has played a power-up')
-                        
+
+                # If player presses 1, 2 or 3, use the corresponding power-up
+                if event.key in powerUpHotkeys:
+                    if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and playerList[currentPlayer - 1].aligned and len(playerList[currentPlayer - 1].inventory) > 0:
+                        playerList[currentPlayer - 1].calculateJumpTile(event.key)
+                        playerList[currentPlayer - 1].isWaiting = False
 
         # Update the dice number text on screen
         if playerList[currentPlayer - 1].isMoving:
             renderDiceNumber(WIN, diceNumber)
         
+        # Render the player's inventory if it is not empty
         if len(playerList[currentPlayer - 1].inventory) > 0:
             renderPlayerInventory(WIN, playerList[currentPlayer - 1])
-            
+        
         playerList[currentPlayer - 1].update()
 
         if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
