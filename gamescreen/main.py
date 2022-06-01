@@ -6,18 +6,18 @@ from game.field import Field
 from game.player import Player
 from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, consumePowerUp
 
-pygame.init()
+# pygame.init()
 
 # Set the window size
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Snakes N\' Ladders')
+# WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Frame rate for the game
-FPS = 60
 
-clock = pygame.time.Clock()
-def main():
-    NUM_PLAYERS = 4 # This is the number of players
+def gameScreen(WIN, NUM_PLAYERS):
+    pygame.display.set_caption('Snakes N\' Ladders')
+    
+    FPS = 60    # Frame rate for the game
+    clock = pygame.time.Clock()
+    
     field = Field()
 
     # Call the draw_squares function of the field instance  
@@ -25,7 +25,7 @@ def main():
 
     # Instantiate the players 
     for i in range(NUM_PLAYERS):
-        picPath = os.path.join(os.path.dirname(__file__), 'assets', f'player{i+1}.png')
+        picPath = os.path.join(os.path.dirname(__file__), '..', 'assets', f'player{i+1}.png')
         playerImage = pygame.image.load(picPath)
 
         # 3rd and 4th parameters are x and y position
@@ -95,7 +95,7 @@ def main():
             playerList[currentPlayer - 1].rolled = False
             playerList[currentPlayer - 1].aligned = False
             if len(playerList[currentPlayer - 1].inventory) > 0: playerList[currentPlayer - 1].isWaiting = True
-            if currentPlayer == 4: currentPlayer = 1
+            if currentPlayer == NUM_PLAYERS: currentPlayer = 1
             else: currentPlayer += 1
         
         powerUpGroup.update()
@@ -103,6 +103,6 @@ def main():
         clock.tick(FPS)
     pygame.quit()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
 

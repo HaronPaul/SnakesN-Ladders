@@ -1,5 +1,6 @@
 import pygame, sys
 from button import Button
+from gamescreen.main import gameScreen
 
 pygame.init()
 
@@ -139,11 +140,11 @@ def multiplayer():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if TWOPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    twoplayers()
+                    gameScreen(SCREEN, 2)
                 if THREEPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    threeplayers()
+                    gameScreen(SCREEN, 3)
                 if FOURPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    fourplayers()
+                    gameScreen(SCREEN, 4)
                 if MULTIPLAYER_BACK.checkForInput(MULTIPLAYER_MOUSE_POS):
                     play()
                 

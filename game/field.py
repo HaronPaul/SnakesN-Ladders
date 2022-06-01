@@ -34,11 +34,11 @@ def generateField(powerUps):
 
     # 6 power ups in total
     while i < 6:
-        # powerUpRow = np.random.randint(0,10)
-        # powerUpColumn = np.random.randint(0,10)
+        powerUpRow = np.random.randint(0,10)
+        powerUpColumn = np.random.randint(0,10)
 
-        powerUpRow = 9
-        powerUpColumn = i+2
+        # powerUpRow = 9
+        # powerUpColumn = i+2
 
         # Check if randomized tile is already a snake/ladder or if it is on number1 tile
         if field[powerUpRow][powerUpColumn] != 0 or (powerUpRow == 9 and powerUpColumn == 0):

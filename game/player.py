@@ -125,7 +125,7 @@ class Player():
                 excess = nextX - 700
                 self.rect.y -= SQUARE_SIZE
                 self.rect.x = 700 - (excess + SQUARE_SIZE)
-            elif nextX <= 0:
+            elif nextX <= 0:    
                 excess = abs(nextX)
                 self.rect.y += SQUARE_SIZE
                 self.rect.x = excess - SQUARE_SIZE
