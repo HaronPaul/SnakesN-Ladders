@@ -5,7 +5,7 @@ from game.constants import SQUARE_SIZE, WIDTH
 
 
 class Player():
-    def __init__(self, image, playerNum, pos_X, pos_Y, field):
+    def __init__(self, image, playerNum, pos_X, pos_Y, field, isCPU):
         self.image = image
         self.playerNum = playerNum
         self.rect = self.image.get_rect()
@@ -21,6 +21,7 @@ class Player():
         self.oddY = [70, 210, 350, 490, 630]
         self.rolled = False
         self.field = field
+        self.isCPU = isCPU
 
         # Controllers for player movement
         self.moveLeft = False
@@ -142,7 +143,7 @@ class Player():
             elif nextX >= 700:
                 excess = nextX - 700
                 self.rect.y += SQUARE_SIZE
-                self.rect.x = excess - SQUARE_SIZE
+                self.rect.x = 700 - (excess - SQUARE_SIZE)
             else:
                 self.rect.x = nextX
             self.endX = self.rect.x
@@ -200,7 +201,7 @@ class Player():
                 self.rect.y += self.velY
             else:
                 self.realign()
-                if len(self.inventory) > 0 and self.isWaiting and self.rolled:
+                if len(self.inventory) > 0 and self.isWaiting and self.rolled and not self.isCPU:
                     print('Waiting for power play')
                     self.aligned = True
                 else:  
@@ -212,7 +213,7 @@ class Player():
                 self.rect.y += self.velY
             else:
                 self.realign()
-                if len(self.inventory) > 0 and self.isWaiting and self.rolled:
+                if len(self.inventory) > 0 and self.isWaiting and self.rolled and not self.isCPU:
                     print('Waiting for power play')
                     self.aligned = True
                 else:                  

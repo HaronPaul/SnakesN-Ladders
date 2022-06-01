@@ -1,6 +1,11 @@
+import pygame
+import os
+from game.constants import WIDTH, HEIGHT, VIOLET
+from game.field import Field
+from game.player import Player
+from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, consumePowerUp
 import pygame, sys
 from button import Button
-from gamescreen.main import gameScreen
 
 pygame.init()
 
@@ -14,97 +19,114 @@ def get_font(size):
 def get_font2(size):
     return pygame.font.Font("assets/Kumadinya.ttf", size)
 
-def computer():
-    pygame.display.set_caption("Play with Computer")
-    while True:
-        SCREEN.blit(BG, (0, 0))
-        
-        COMPUTER_MOUSE_POS = pygame.mouse.get_pos()
+def gameScreen(WIN, NUM_PLAYERS, vsCPU):
+    pygame.display.set_caption('Snakes N\' Ladders')
     
-        COMPUTER_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(610,583), 
-                            text_input="BACK", font=get_font2(35), base_color="white", hovering_color="black")
-
-        COMPUTER_BACK.changeColor(COMPUTER_MOUSE_POS)
-        COMPUTER_BACK.update(SCREEN)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if COMPUTER_BACK.checkForInput(COMPUTER_MOUSE_POS):
-                    play()
-                
-        pygame.display.update()
-        
-def twoplayers():
-    pygame.display.set_caption("2 Players")
-    while True:
-        SCREEN.blit(BG, (0, 0))
-        
-        TWOPLAYERS_MOUSE_POS = pygame.mouse.get_pos()
+    FPS = 60    # Frame rate for the game
+    clock = pygame.time.Clock()
     
-        TWOPLAYERS_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(610,583), 
-                            text_input="BACK", font=get_font2(35), base_color="white", hovering_color="black")
+    field = Field()
 
-        TWOPLAYERS_BACK.changeColor(TWOPLAYERS_MOUSE_POS)
-        TWOPLAYERS_BACK.update(SCREEN)
+    # Call the draw_squares function of the field instance  
+    playerList = []
+
+    # Instantiate the players 
+    playerCPU = False
+    for i in range(NUM_PLAYERS):
+        picPath = os.path.join(os.path.dirname(__file__), 'assets', f'player{i+1}.png')
+        playerImage = pygame.image.load(picPath)
+
+        if vsCPU and i>0:
+            playerCPU = True
+        # 3rd and 4th parameters are x and y position
+        newPlayer = Player(playerImage, i+1, 0, 630, field, playerCPU) # Initialize player's position at number 1 tile
+        playerList.append(newPlayer)
+
+    powerUpGroup = pygame.sprite.Group()
+    powerUpHotkeys = [pygame.K_1, pygame.K_2, pygame.K_3]
+    for p in field.powerUps:
+       powerUpGroup.add(p)
+
+    currentPlayer = 1 # Initialize player 1 at start of the game
+    run = True
+    while run:
+
+        # Reset rendering every loop 
+        # Render other asssets (buttons, player text, etc)
+        renderExtras(WIN, currentPlayer)
+        field.draw_squares(WIN)
         
+        #Render the power-ups 
+        powerUpGroup.draw(WIN)
+
+        # Render the players
+        for p in playerList:
+            p.draw(WIN)
+
+        GAMESCREEN_BACK = Button(image=pygame.image.load("assets/Gamequit Ob.png"), pos=(750,660), text_input="QUIT", font=get_font2(35), base_color="black", hovering_color="red")
+        GAMESCREEN_MOUSE_POS = pygame.mouse.get_pos()
+        GAMESCREEN_BACK.changeColor(GAMESCREEN_MOUSE_POS)
+
+        print(f'is player CPU? {playerList[currentPlayer - 1].isCPU}')
+        
+        if playerList[currentPlayer - 1].isCPU and  playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
+            playerList[currentPlayer - 1].rollDice()
+            diceNumber = playerList[currentPlayer - 1].rolledNumber
+        
+        # Loop through all the events happening. May be a mouse click/key press
         for event in pygame.event.get():
+            # When user clicks the close button of the window equate run to False and hasPlayed to True
+            
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if TWOPLAYERS_BACK.checkForInput(TWOPLAYERS_MOUSE_POS):
-                    multiplayer()
-                
-        pygame.display.update()
+                run = False
 
-def threeplayers():
-    pygame.display.set_caption("3 Players")
-    while True:
-        SCREEN.blit(BG, (0, 0))
-        
-        THREEPLAYERS_MOUSE_POS = pygame.mouse.get_pos()
-    
-        THREEPLAYERS_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(610,583), 
-                            text_input="BACK", font=get_font2(35), base_color="white", hovering_color="black")
-
-        THREEPLAYERS_BACK.changeColor(THREEPLAYERS_MOUSE_POS)
-        THREEPLAYERS_BACK.update(SCREEN)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if THREEPLAYERS_BACK.checkForInput(THREEPLAYERS_MOUSE_POS):
-                    multiplayer()
-                
-        pygame.display.update()
-        
-def fourplayers():
-    pygame.display.set_caption("4 Players")
-    while True:
-        SCREEN.blit(BG, (0, 0))
-        
-        FOURPLAYERS_MOUSE_POS = pygame.mouse.get_pos()
-    
-        FOURPLAYERS_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(610,583), 
-                            text_input="BACK", font=get_font2(35), base_color="white", hovering_color="black")
+                    if GAMESCREEN_BACK.checkForInput(GAMESCREEN_MOUSE_POS):
+                        play()
+            
+            if not playerList[currentPlayer - 1].isCPU:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        # This condition will prevent other players from moving when the currebt player is moving
+                        if playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
+                            playerList[currentPlayer - 1].rollDice()
+                            diceNumber = playerList[currentPlayer - 1].rolledNumber
 
-        FOURPLAYERS_BACK.changeColor(FOURPLAYERS_MOUSE_POS)
-        FOURPLAYERS_BACK.update(SCREEN)
+                    if event.key == pygame.K_ESCAPE:
+                        if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and playerList[currentPlayer - 1].aligned and len(playerList[currentPlayer - 1].inventory) > 0:
+                            playerList[currentPlayer - 1].isWaiting = False
+
+                    # If player presses 1, 2 or 3, use the corresponding power-up
+                    if event.key in powerUpHotkeys:
+                        if playerList[currentPlayer - 1].rolled and playerList[currentPlayer - 1].isWaiting and playerList[currentPlayer - 1].aligned and len(playerList[currentPlayer - 1].inventory) > 0:
+                            playerList[currentPlayer - 1].calculateJumpTile(event.key)
+                            playerList[currentPlayer - 1].isWaiting = False
+            
+        GAMESCREEN_BACK.update(SCREEN)
+
+        # Update the dice number text on screen
+        if playerList[currentPlayer - 1].isMoving:
+            renderDiceNumber(WIN, diceNumber)
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if FOURPLAYERS_BACK.checkForInput(FOURPLAYERS_MOUSE_POS):
-                    multiplayer()
-                
-        pygame.display.update()
+        # Render the player's inventory if it is not empty
+        if len(playerList[currentPlayer - 1].inventory) > 0:
+            renderPlayerInventory(WIN, playerList[currentPlayer - 1])
+        
+        playerList[currentPlayer - 1].update()
+
+        if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
+            print(f'Player {currentPlayer} is done')
+            playerList[currentPlayer - 1].checkTile()
+            playerList[currentPlayer - 1].rolled = False
+            playerList[currentPlayer - 1].aligned = False
+            if len(playerList[currentPlayer - 1].inventory) > 0: playerList[currentPlayer - 1].isWaiting = True
+            if currentPlayer == NUM_PLAYERS: currentPlayer = 1
+            else: currentPlayer += 1
+
+        pygame.display.update()        
+        powerUpGroup.update()
+        clock.tick(FPS)
+    pygame.quit()
 
 def multiplayer():
     pygame.display.set_caption("Multiplayer")
@@ -140,11 +162,11 @@ def multiplayer():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if TWOPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    gameScreen(SCREEN, 2)
+                    gameScreen(SCREEN, 2, False)
                 if THREEPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    gameScreen(SCREEN, 3)
+                    gameScreen(SCREEN, 3, False)
                 if FOURPLAYERS_BUTTON.checkForInput(MULTIPLAYER_MOUSE_POS):
-                    gameScreen(SCREEN, 4)
+                    gameScreen(SCREEN, 4, False)
                 if MULTIPLAYER_BACK.checkForInput(MULTIPLAYER_MOUSE_POS):
                     play()
                 
@@ -181,7 +203,7 @@ def play():
                 if MULTIPLAYER_BUTTON.checkForInput(PLAY_MOUSE_POS):
                     multiplayer()
                 if COMPUTER_BUTTON.checkForInput(PLAY_MOUSE_POS):
-                    computer()
+                    gameScreen(SCREEN, 2, True)
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     game_title()
                 
@@ -196,43 +218,52 @@ def rules():
 
         text= "Rules"
         text1='1. Initally, all the players are at the starting position.'
-        text2='2. Take it in turns to roll the dice.'
-        text3='3. Move forward the number of tiles shown on the dice.'
-        text4='4. If you land at the bottom of a ladder, you can move up to the top of the ladder.'
-        text5='5. If you land on the head of a snake, you must slide down to the tail of the snake.'
-        text6='6. If you land on a power-up tile, you can use it for your next turn.'
-        text7='7. The first player to get to the FINAL position is the winner.'
-        text8='8. Hit enter to roll the dice.'
+        text2='2. Take it in turns to press the SPACEBAR and roll the dice.'
+        text3='3. You will move forward the number of tiles shown on the dice.'
+        text4='4. If you land at the bottom of a ladder, you will move up to the top of the ladder.'
+        text5='5. If you land on the head of a snake, you will slide down to the tail of the snake.'
+        text6='6. If you land on a power-up tile, you can use it for your future turn.'
+        text7='Note: If a player has a power-up in the inventory, wait until it has finished moving.'
+        text8='After moving, you can press ESC to skip using a power up or press 1, 2, or 3 to use'
+        text9='the power-up in the inventory.'
+        text10='7. The first player to get to the FINAL position is the winner.'
         
         RULES_TEXT = get_font(45).render(text, True, "green")
         RULES_OB = RULES_TEXT.get_rect(center=(400, 120))
         SCREEN.blit(RULES_TEXT, RULES_OB)
         RULES_TEXT1 = get_font2(20).render(text1, True, "white")
-        RULES_OB = RULES_TEXT1.get_rect(center=(283, 200))
+        RULES_OB = RULES_TEXT1.get_rect(center=(247, 200))
         SCREEN.blit(RULES_TEXT1, RULES_OB)
         RULES_TEXT2 = get_font2(20).render(text2, True, "white")
-        RULES_OB = RULES_TEXT2.get_rect(center=(219, 250))
+        RULES_OB = RULES_TEXT2.get_rect(center=(279, 240))
         SCREEN.blit(RULES_TEXT2, RULES_OB)
         RULES_TEXT3 = get_font2(20).render(text3, True, "white")
-        RULES_OB = RULES_TEXT3.get_rect(center=(302, 300))
+        RULES_OB = RULES_TEXT3.get_rect(center=(290, 280))
         SCREEN.blit(RULES_TEXT3, RULES_OB)
         RULES_TEXT4 = get_font2(20).render(text4, True, "white")
-        RULES_OB = RULES_TEXT4.get_rect(center=(400, 350))
+        RULES_OB = RULES_TEXT4.get_rect(center=(362, 320))
         SCREEN.blit(RULES_TEXT4, RULES_OB)
         RULES_TEXT5 = get_font2(20).render(text5, True, "white")
-        RULES_OB = RULES_TEXT5.get_rect(center=(398, 400))
+        RULES_OB = RULES_TEXT5.get_rect(center=(355, 360))
         SCREEN.blit(RULES_TEXT5, RULES_OB)
         RULES_TEXT6= get_font2(20).render(text6, True, "white")
-        RULES_OB = RULES_TEXT6.get_rect(center=(344, 450))
+        RULES_OB = RULES_TEXT6.get_rect(center=(312, 400))
         SCREEN.blit(RULES_TEXT6, RULES_OB)
-        RULES_TEXT7= get_font2(20).render(text7, True, "white")
-        RULES_OB = RULES_TEXT7.get_rect(center=(325, 500))
+        RULES_TEXT7= get_font2(20).render(text7, True, "yellow")
+        RULES_OB = RULES_TEXT7.get_rect(center=(390, 440))
         SCREEN.blit(RULES_TEXT7, RULES_OB)
-        RULES_TEXT8= get_font2(20).render(text8, True, "white")
-        RULES_OB = RULES_TEXT8.get_rect(center=(198, 550))
+        RULES_TEXT8= get_font2(20).render(text8, True, "yellow")
+        RULES_OB = RULES_TEXT8.get_rect(center=(420, 480))
         SCREEN.blit(RULES_TEXT8, RULES_OB)
+        RULES_TEXT9 = get_font2(20).render(text9, True, "yellow")
+        RULES_OB = RULES_TEXT9.get_rect(center=(217, 520))
+        SCREEN.blit(RULES_TEXT9, RULES_OB)
+        RULES_TEXT10 = get_font2(20).render(text10, True, "white")
+        RULES_OB = RULES_TEXT10.get_rect(center=(283, 560))
+        SCREEN.blit(RULES_TEXT10, RULES_OB)
 
-        RULES_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(610,583), 
+
+        RULES_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(625,583), 
                             text_input="BACK", font=get_font2(35), base_color="white", hovering_color="black")
 
         RULES_BACK.changeColor(RULES_MOUSE_POS)
