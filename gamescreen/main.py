@@ -6,12 +6,6 @@ from game.field import Field
 from game.player import Player
 from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, consumePowerUp
 
-# pygame.init()
-
-# Set the window size
-# WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-
-
 def gameScreen(WIN, NUM_PLAYERS):
     pygame.display.set_caption('Snakes N\' Ladders')
     

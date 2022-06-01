@@ -94,7 +94,7 @@ class Player():
         
         # Check if tile is power-up
         for i in range(len(powerUpTiles)):
-              if(self.rect.x + self.width//2) in range(powerUpTiles[i].pos[0], powerUpTiles[i].pos[0]+SQUARE_SIZE) and (self.rect.y + self.height // 2) in range(powerUpTiles[i].pos[1], powerUpTiles[i].pos[1]+SQUARE_SIZE):
+              if len(self.inventory) < 3 and (self.rect.x + self.width//2) in range(powerUpTiles[i].pos[0], powerUpTiles[i].pos[0]+SQUARE_SIZE) and (self.rect.y + self.height // 2) in range(powerUpTiles[i].pos[1], powerUpTiles[i].pos[1]+SQUARE_SIZE):
                   if powerUpTiles[i].consumed == False:
                     powerUpTiles[i].consumed = True
                     self.inventory.append(powerUpTiles[i])
@@ -125,7 +125,7 @@ class Player():
                 excess = nextX - 700
                 self.rect.y -= SQUARE_SIZE
                 self.rect.x = 700 - (excess + SQUARE_SIZE)
-            elif nextX <= 0:    
+            elif nextX < 0:    
                 excess = abs(nextX)
                 self.rect.y += SQUARE_SIZE
                 self.rect.x = excess - SQUARE_SIZE
@@ -135,7 +135,7 @@ class Player():
         
         else:
             nextX = self.rect.x - movement
-            if nextX <= 0:
+            if nextX < 0:
                 excess = abs(nextX)
                 self.rect.x = excess - SQUARE_SIZE
                 self.rect.y -= SQUARE_SIZE
