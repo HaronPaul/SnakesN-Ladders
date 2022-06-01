@@ -3,7 +3,7 @@ import os
 from game.constants import WIDTH, HEIGHT, VIOLET
 from game.field import Field
 from game.player import Player
-from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, consumePowerUp
+from game.functions import renderExtras, renderDiceNumber, renderPlayerInventory, renderWaitingText
 import pygame, sys
 from button import Button
 
@@ -39,7 +39,7 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
         if vsCPU and i>0:
             playerCPU = True
         # 3rd and 4th parameters are x and y position
-        newPlayer = Player(playerImage, i+1, 0, 630, field, playerCPU) # Initialize player's position at number 1 tile
+        newPlayer = Player(playerImage, i+1, 0, 70, field, playerCPU) # Initialize player's position at number 1 tile
         playerList.append(newPlayer)
 
     powerUpGroup = pygame.sprite.Group()
@@ -50,7 +50,6 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
     currentPlayer = 1 # Initialize player 1 at start of the game
     run = True
     while run:
-
         # Reset rendering every loop 
         # Render other asssets (buttons, player text, etc)
         renderExtras(WIN, currentPlayer)
@@ -66,8 +65,6 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
         GAMESCREEN_BACK = Button(image=pygame.image.load("assets/Gamequit Ob.png"), pos=(750,660), text_input="QUIT", font=get_font2(35), base_color="black", hovering_color="red")
         GAMESCREEN_MOUSE_POS = pygame.mouse.get_pos()
         GAMESCREEN_BACK.changeColor(GAMESCREEN_MOUSE_POS)
-
-        print(f'is player CPU? {playerList[currentPlayer - 1].isCPU}')
         
         if playerList[currentPlayer - 1].isCPU and  playerList[currentPlayer - 1].isMoving == False and playerList[currentPlayer - 1].rolled == False:
             playerList[currentPlayer - 1].rollDice()
@@ -81,8 +78,8 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                    if GAMESCREEN_BACK.checkForInput(GAMESCREEN_MOUSE_POS):
-                        play()
+                if GAMESCREEN_BACK.checkForInput(GAMESCREEN_MOUSE_POS):
+                    play()
             
             if not playerList[currentPlayer - 1].isCPU:
                 if event.type == pygame.KEYDOWN:
@@ -112,10 +109,18 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
         if len(playerList[currentPlayer - 1].inventory) > 0:
             renderPlayerInventory(WIN, playerList[currentPlayer - 1])
         
+        if len(playerList[currentPlayer - 1].inventory) > 0 and playerList[currentPlayer - 1].aligned and playerList[currentPlayer - 1].isWaiting:
+            renderWaitingText(WIN)
+        
         playerList[currentPlayer - 1].update()
-
+        print(playerList[currentPlayer - 1].rect.x)
         if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
-            print(f'Player {currentPlayer} is done')
+            if playerList[currentPlayer - 1].win:
+                print(f'Player {currentPlayer} has won!!')
+                break
+                # Blit the victory image here/ Transfer to another screen
+                # --- INSERT CODE ---
+                #
             playerList[currentPlayer - 1].checkTile()
             playerList[currentPlayer - 1].rolled = False
             playerList[currentPlayer - 1].aligned = False
@@ -169,7 +174,6 @@ def multiplayer():
                     gameScreen(SCREEN, 4, False)
                 if MULTIPLAYER_BACK.checkForInput(MULTIPLAYER_MOUSE_POS):
                     play()
-                
         pygame.display.update()
 
 def play():

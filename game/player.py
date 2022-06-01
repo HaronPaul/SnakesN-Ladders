@@ -29,12 +29,14 @@ class Player():
         self.moveUp = False
         self.moveDown = False
 
-        self.currentRow = 9
+        self.currentRow = 1
         self.currentCol = 0
         self.speed = 5
         self.rolledNumber = 0
         self.isMoving = False
+        self.lastRow = False
         self.isWaiting = True
+        self.win = False
 
     def rollDice(self):
         self.rolled = True
@@ -55,18 +57,24 @@ class Player():
         pos_y = y // SQUARE_SIZE
         self.currentCol = pos_x
         self.currentRow = pos_y
+
         self.rect.x = pos_x * SQUARE_SIZE
         self.rect.y = pos_y * SQUARE_SIZE
         self.aligned = False
+        
+        if self.currentRow == 0 and self.currentCol == 0:
+            self.win = True
+        # Reset all movement
 
     def draw(self, win):
         win.blit(self.image, self.rect)
 
-    def stop(self):
+    def resetMovement(self):
+        self.moveDown = False
+        self.moveUp = False
         self.moveLeft = False
         self.moveRight = False
-        self.moveUp = False
-        self.moveDown = False
+        self.lastRow = False
 
     def checkTile(self):
         ladderStart = self.field.ladderStart
@@ -105,7 +113,6 @@ class Player():
         if keyPressed == 49: index = 1
         elif keyPressed == 50: index = 2
         elif keyPressed == 51: index = 3
-        print('Calculate the number of tiles to be moved here')
 
         if index > len(self.inventory):
             return
@@ -114,7 +121,6 @@ class Player():
 
         powerUpValue = powerUp.number
         movement = SQUARE_SIZE * powerUpValue
-        print(f'Move to x = {self.rect.x + movement}')
 
         # Check what row is the player currently on
         nextX = 0
@@ -138,12 +144,15 @@ class Player():
             nextX = self.rect.x - movement
             if nextX < 0:
                 excess = abs(nextX)
-                self.rect.x = excess - SQUARE_SIZE
-                self.rect.y -= SQUARE_SIZE
+                if self.currentRow != 0:
+                    self.rect.x = excess - SQUARE_SIZE
+                    self.rect.y -= SQUARE_SIZE
+                else:
+                    self.rect.x = excess
             elif nextX >= 700:
                 excess = nextX - 700
                 self.rect.y += SQUARE_SIZE
-                self.rect.x = 700 - (excess - SQUARE_SIZE)
+                self.rect.x = (700 - excess) - SQUARE_SIZE
             else:
                 self.rect.x = nextX
             self.endX = self.rect.x
@@ -162,6 +171,7 @@ class Player():
         if self.moveUp: self.velY = -self.speed
         if self.moveDown: self.velY = self.speed
 
+
         # Change direction if row is odd-numbered
         if self.currentRow % 2 == 1:
             self.moveUp = False
@@ -178,22 +188,28 @@ class Player():
             if self.rect.x >= 9*SQUARE_SIZE - 5:
                 self.moveUp = True
                 self.moveRight = False
-                
         # Change direction if row is even-numbered
-        if self.currentRow % 2 == 0:
-            self.moveUp = False
-            self.moveRight = False
-            self.moveLeft = True
+        elif self.currentRow % 2 == 0:
+            if not self.lastRow:
+                self.moveUp = False
+                self.moveRight = False
+                self.moveLeft = True
             
             for oddY in self.oddY:
                 if self.rect.y in range(oddY, oddY+(SQUARE_SIZE//8)):
                     self.currentRow -= 1
-                    
                     # Recalculate endX when changing rows
                     self.endX = abs(self.endX - 0) - SQUARE_SIZE
             if self.rect.x <= 0:
-                self.moveUp = True  
-                self.moveLeft = False
+                if self.currentRow == 0:
+                    self.moveUp = False
+                    self.lastRow = True
+                    self.endX = abs(self.endX)  
+                    self.moveLeft = False
+                    self.moveRight = True
+                else:
+                    self.moveUp = True  
+                    self.moveLeft = False
 
         if self.currentRow % 2 == 1:
             if self.rect.x < self.endX:
@@ -202,22 +218,20 @@ class Player():
             else:
                 self.realign()
                 if len(self.inventory) > 0 and self.isWaiting and self.rolled and not self.isCPU:
-                    print('Waiting for power play')
                     self.aligned = True
                 else:  
+                    self.resetMovement()
                     self.isMoving = False
                     return
         elif self.currentRow % 2 == 0:
-            if self.rect.x > self.endX:
+            if self.rect.x > self.endX or (self.rect.x < self.endX and self.currentRow == 0):
                 self.rect.x += self.velX
                 self.rect.y += self.velY
             else:
                 self.realign()
                 if len(self.inventory) > 0 and self.isWaiting and self.rolled and not self.isCPU:
-                    print('Waiting for power play')
                     self.aligned = True
                 else:                  
+                    self.resetMovement()
                     self.isMoving = False
                     return
-
-        

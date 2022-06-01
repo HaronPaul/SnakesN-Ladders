@@ -57,7 +57,7 @@ def renderDiceNumber(WIN, diceNumber):
     WIN.blit(diceImage, (700, 220))
 
 def renderPlayerInventory(WIN, player):
-    pygame.draw.rect(WIN, (0,0,0), pygame.Rect(700,400,100,500))
+    pygame.draw.rect(WIN, (0,0,0), pygame.Rect(700,400,100,450))
 
     start = 410
     for powerUp in player.inventory:
@@ -65,14 +65,10 @@ def renderPlayerInventory(WIN, player):
         WIN.blit(powerUp.image, (drawX, start))
         start += 80
 
-    text1 = 'Pass'
-    PASS_TEXT = get_font(25).render(text1, True, 'white')
-    PASS_TEXT_POS = PASS_TEXT.get_rect(center=(((700+800) / 2), 670))
-    WIN.blit(PASS_TEXT, PASS_TEXT_POS)
-
-def consumePowerUp(WIN, player, keyPressed):
-    index = 0
-    
-    print(f'Key pressed is {index}')
-    print('Remove the power-up here')
+        
+def renderWaitingText(WIN):
+    text = 'Waiting'
+    WAIT_TEXT = get_font(18).render(text, True, 'white')
+    WAIT_TEXT_POS = WAIT_TEXT.get_rect(center=(((700+800) / 2), 630))
+    WIN.blit(WAIT_TEXT, WAIT_TEXT_POS)
 
