@@ -19,6 +19,48 @@ def get_font(size):
 def get_font2(size):
     return pygame.font.Font("assets/Kumadinya.ttf", size)
 
+def winner(player):
+    pygame.display.set_caption("Winner")
+    while True:
+        SCREEN.blit(BG, (0, 0))
+        WINNER_MOUSE_POS = pygame.mouse.get_pos()
+            
+        if player == 0:
+            text="Player 1"
+            
+        if player == 1:
+            text="Player 2"
+             
+        if player == 2:
+            text="Player 3"
+            
+        if player == 3:
+            text="Player 4"            
+        
+        text1="WINS!"
+        WINNER_TEXT = get_font(90).render(text, True, "red")
+        WINNER_OB = WINNER_TEXT.get_rect(center=(400, 250))
+        SCREEN.blit(WINNER_TEXT, WINNER_OB)
+        WINNER_TEXT = get_font(110).render(text1, True, "red")
+        WINNER_OB = WINNER_TEXT.get_rect(center=(400, 400))
+        SCREEN.blit(WINNER_TEXT, WINNER_OB)
+                
+        WINNER_BACK = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(400,570), 
+                            text_input="MENU", font=get_font2(35), base_color="white", hovering_color="black")
+
+        WINNER_BACK.changeColor(WINNER_MOUSE_POS)
+        WINNER_BACK.update(SCREEN)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if WINNER_BACK.checkForInput(WINNER_MOUSE_POS):
+                    game_title()
+
+        pygame.display.update()
+
 def gameScreen(WIN, NUM_PLAYERS, vsCPU):
     pygame.display.set_caption('Snakes N\' Ladders')
     
@@ -39,7 +81,7 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
         if vsCPU and i>0:
             playerCPU = True
         # 3rd and 4th parameters are x and y position
-        newPlayer = Player(playerImage, i+1, 0, 70, field, playerCPU) # Initialize player's position at number 1 tile
+        newPlayer = Player(playerImage, i+1, 0, 630, field, playerCPU) # Initialize player's position at number 1 tile
         playerList.append(newPlayer)
 
     powerUpGroup = pygame.sprite.Group()
@@ -117,10 +159,7 @@ def gameScreen(WIN, NUM_PLAYERS, vsCPU):
         if(playerList[currentPlayer - 1].rolled == True and playerList[currentPlayer - 1].isMoving == False):
             if playerList[currentPlayer - 1].win:
                 print(f'Player {currentPlayer} has won!!')
-                break
-                # Blit the victory image here/ Transfer to another screen
-                # --- INSERT CODE ---
-                #
+                winner(currentPlayer - 1)
             playerList[currentPlayer - 1].checkTile()
             playerList[currentPlayer - 1].rolled = False
             playerList[currentPlayer - 1].aligned = False
@@ -236,34 +275,34 @@ def rules():
         RULES_OB = RULES_TEXT.get_rect(center=(400, 120))
         SCREEN.blit(RULES_TEXT, RULES_OB)
         RULES_TEXT1 = get_font2(20).render(text1, True, "white")
-        RULES_OB = RULES_TEXT1.get_rect(center=(247, 200))
+        RULES_OB = RULES_TEXT1.get_rect(center=(247, 180))
         SCREEN.blit(RULES_TEXT1, RULES_OB)
         RULES_TEXT2 = get_font2(20).render(text2, True, "white")
-        RULES_OB = RULES_TEXT2.get_rect(center=(279, 240))
+        RULES_OB = RULES_TEXT2.get_rect(center=(279, 220))
         SCREEN.blit(RULES_TEXT2, RULES_OB)
         RULES_TEXT3 = get_font2(20).render(text3, True, "white")
-        RULES_OB = RULES_TEXT3.get_rect(center=(290, 280))
+        RULES_OB = RULES_TEXT3.get_rect(center=(290, 260))
         SCREEN.blit(RULES_TEXT3, RULES_OB)
         RULES_TEXT4 = get_font2(20).render(text4, True, "white")
-        RULES_OB = RULES_TEXT4.get_rect(center=(362, 320))
+        RULES_OB = RULES_TEXT4.get_rect(center=(362, 300))
         SCREEN.blit(RULES_TEXT4, RULES_OB)
         RULES_TEXT5 = get_font2(20).render(text5, True, "white")
-        RULES_OB = RULES_TEXT5.get_rect(center=(355, 360))
+        RULES_OB = RULES_TEXT5.get_rect(center=(355, 340))
         SCREEN.blit(RULES_TEXT5, RULES_OB)
         RULES_TEXT6= get_font2(20).render(text6, True, "white")
-        RULES_OB = RULES_TEXT6.get_rect(center=(312, 400))
+        RULES_OB = RULES_TEXT6.get_rect(center=(312, 380))
         SCREEN.blit(RULES_TEXT6, RULES_OB)
         RULES_TEXT7= get_font2(20).render(text7, True, "yellow")
-        RULES_OB = RULES_TEXT7.get_rect(center=(390, 440))
+        RULES_OB = RULES_TEXT7.get_rect(center=(390, 420))
         SCREEN.blit(RULES_TEXT7, RULES_OB)
         RULES_TEXT8= get_font2(20).render(text8, True, "yellow")
-        RULES_OB = RULES_TEXT8.get_rect(center=(420, 480))
+        RULES_OB = RULES_TEXT8.get_rect(center=(420, 460))
         SCREEN.blit(RULES_TEXT8, RULES_OB)
         RULES_TEXT9 = get_font2(20).render(text9, True, "yellow")
-        RULES_OB = RULES_TEXT9.get_rect(center=(217, 520))
+        RULES_OB = RULES_TEXT9.get_rect(center=(217, 500))
         SCREEN.blit(RULES_TEXT9, RULES_OB)
         RULES_TEXT10 = get_font2(20).render(text10, True, "white")
-        RULES_OB = RULES_TEXT10.get_rect(center=(283, 560))
+        RULES_OB = RULES_TEXT10.get_rect(center=(283, 540))
         SCREEN.blit(RULES_TEXT10, RULES_OB)
 
 
@@ -300,7 +339,7 @@ def game_title():
                             text_input="RULES", font=get_font2(35), base_color="white", hovering_color="black")
         QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Ob.png"), pos=(400,570), 
                             text_input="QUIT", font=get_font2(35), base_color="white", hovering_color="black")
-
+                            
         SCREEN.blit(GT1_TEXT, GT1_RECT)
         SCREEN.blit(GT2_TEXT, GT2_RECT)
 
@@ -320,7 +359,5 @@ def game_title():
                 if QUIT_BUTTON.checkForInput(GT_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-
         pygame.display.update()
-
 game_title()
